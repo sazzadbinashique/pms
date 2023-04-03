@@ -37,7 +37,7 @@
 
                 <div class="col-xs-2 col-sm-2 col-md-2">
                     <button id="unique-search" style="height:30px; font-weight:bold; margin-top:42px; background-color:#f4f6f9; border:1px solid #4B92f9;">Search</button>
-                    <a class="text-decoration-none" href="{{route('products.index')}}" style="height:30px; font-weight:bold; margin-top:42px; padding: 5px; color: #0b2e13; background-color:#f4f6f9; border:1px solid #4B92f9;">Clear</a>
+                    {{--<a class="text-decoration-none" href="{{route('products.index')}}" style="height:30px; font-weight:bold; margin-top:42px; padding: 5px; color: #0b2e13; background-color:#f4f6f9; border:1px solid #4B92f9;">Clear</a>--}}
 
                 </div>
             </div>
