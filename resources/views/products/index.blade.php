@@ -108,7 +108,7 @@
             ajax: {
                 url: "{{ route('products.index') }}",
                 data: function (d) {
-                    d.medicine_name = $('#generic_name_select').val();
+                    d.medicine_name = $('#product_name_select').val();
                     d.generic_name = $('#generic_name_select').val();
                 }
             },

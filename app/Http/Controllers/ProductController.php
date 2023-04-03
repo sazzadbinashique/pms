@@ -22,8 +22,9 @@ class ProductController extends Controller
     {
         if ($request->ajax()) {
             $user = Auth()->user();
-             $medicine_id = $request->input('medicine_name');
-            $generic_id = $request->input('generic_name');
+            $medicine_id = $request->medicine_name;
+            $generic_id = $request->generic_name;
+
             if ($medicine_id || $generic_id){
                 $medicine_nm = ''; $medicine_gnrc_nm = ''; $medicine_strngth = '';
                 $product_name_strengths= Product::where('id',$medicine_id)->orWhere('id',$generic_id)->get();
