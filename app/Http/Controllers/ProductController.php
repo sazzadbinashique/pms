@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\ProductExport;
 use App\Models\Pfi;
 use App\Product;
 use App\Price;
@@ -9,6 +10,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use DB;
 use Auth;
+
+use Maatwebsite\Excel\Facades\Excel;
 use Yajra\DataTables\Facades\DataTables;
 
 class ProductController extends Controller
@@ -20,6 +23,12 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
+        $ExportToExcel = $request->ExportToExcel;
+
+       if ($ExportToExcel == 'Yes'){
+           return Excel::download(new ProductExport(), 'products.xlsx');
+         }
+
         if ($request->ajax()) {
             $user = Auth()->user();
             $medicine_id = $request->medicine_name;
@@ -35,7 +44,8 @@ class ProductController extends Controller
                 }
                 $data = Product::where('medicine_name',$medicine_nm)->Where('generic_name',$medicine_gnrc_nm)->Where('strength',$medicine_strngth)->get();
             }else{
-                $data = Product::orderBy('medicine_name','asc')->get();
+                //$data = Product::orderBy('medicine_name','asc')->get();
+                $data = Product::all();
             }
 
             return Datatables::of($data)

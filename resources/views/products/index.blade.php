@@ -37,8 +37,6 @@
 
                 <div class="col-xs-2 col-sm-2 col-md-2">
                     <button id="unique-search" style="height:30px; font-weight:bold; margin-top:42px; background-color:#f4f6f9; border:1px solid #4B92f9;">Search</button>
-                    {{--<a class="text-decoration-none" href="{{route('products.index')}}" style="height:30px; font-weight:bold; margin-top:42px; padding: 5px; color: #0b2e13; background-color:#f4f6f9; border:1px solid #4B92f9;">Clear</a>--}}
-
                 </div>
             </div>
 
@@ -79,18 +77,13 @@
     </div>
 @endsection
 
-
-
 <!-- this 2 css only for report -->
-
 @section('third_party_stylesheets')
     <link rel="stylesheet" type="text/css" href="{{ asset('report-generate/css/jquery.dataTables.min.css')}}">
     <link rel="stylesheet" type="text/css" href="{{ asset('report-generate/css/buttons.dataTables.min.css')}}">
-
 @endsection
 
 @section('third_party_scripts')
-
     <script src="{{ asset('report-generate/js/jquery.dataTables.min.js') }}"></script>
     <script src="{{ asset('report-generate/js/dataTables.buttons.min.js') }}"></script>
     <script src="{{ asset('report-generate/js/jszip.min.js') }}"></script>
@@ -104,7 +97,7 @@
             processing: true,
             serverSide: true,
             searching: true,
-            //ajax:"{{ route('products.index') }}",
+            lengthMenu: [[10, 25, 50,100,250,500 -1], [10, 25, 50, 100,250,500, "All"]],
             ajax: {
                 url: "{{ route('products.index') }}",
                 data: function (d) {
@@ -112,10 +105,6 @@
                     d.generic_name = $('#generic_name_select').val();
                 }
             },
-            dom: 'Blfrtip',
-            buttons: [
-                'excel', 'pdf', 'print'
-            ],
             columns: [
                 {data: 'DT_RowIndex', name: 'DT_RowIndex'},
                 {data: 'product_category', className: 'align-middle'},
@@ -125,8 +114,38 @@
                 {data: 'strength', className: 'align-middle'},
                 {data: 'action', className: 'text-center align-middle', orderable: false, searchable: false},
             ],
-        });
+            dom: 'Blfrtip',
+            "buttons": [{
+                extend: 'collection',
+                text: 'Export',
+                buttons: ['export', { extend: 'excel',
+                    text: 'Export All Excel',              //Export all to CSV file
+                    action: function (e, dt, node, config) {
+                        window.location.href = '{{ route('products.index') }}?ExportToExcel=Yes';
+                    }
+                },
+                    { extend: 'pdf',
+                        text: 'PDF Current Page',
+                        exportOptions: {
+                            columns: [0,1,2,3,4,5],
+                            modifier: {
+                                page: 'current'
+                            }
+                        },
+                    },
+                    { extend: 'excel',
+                        text: 'Excel Current Page',              //Export all to CSV file
+                        exportOptions: {
+                            columns: [0,1,2,3,4,5],
+                            modifier: {
+                                page: 'all'
+                            }
+                        },
+                    }]
+            }
+            ],
 
+        });
 
         $('#unique-search').on('click', function(e) {
             table.draw();
