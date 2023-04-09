@@ -18,7 +18,6 @@
                     @endcan
                 </ul>
             </div>
-
             <div class="row" style="margin-left:5px; margin-top:7px;">
 
                 <div class="col-xs-3 col-sm-3 col-md-3">
@@ -36,7 +35,7 @@
                 </div>
 
                 <div class="col-xs-2 col-sm-2 col-md-2">
-                    <button id="unique-search" style="height:30px; font-weight:bold; margin-top:42px; background-color:#f4f6f9; border:1px solid #4B92f9;">Search</button>
+                    <button onclick="myFunction(); return false;" style="height:30px; font-weight:bold; margin-top:42px; background-color:#f4f6f9; border:1px solid #4B92f9;">Search</button>
                 </div>
             </div>
 
@@ -93,11 +92,16 @@
     <script src="{{ asset('report-generate/js/buttons.print.min.js') }}"></script>
 
     <script>
+
+        myFunction = function() {
+            var table = $('#ppp').DataTable();
+            table.ajax.reload();
+        }
         var table = $('#ppp').DataTable({
             processing: true,
-            serverSide: true,
+            serverSide: false,
             searching: true,
-            lengthMenu: [[10, 25, 50,100,250,500 -1], [10, 25, 50, 100,250,500, "All"]],
+            lengthMenu: [[10, 25, 50,100,250, -1], [10, 25, 50, 100,250, "All"]],
             ajax: {
                 url: "{{ route('products.index') }}",
                 data: function (d) {
@@ -115,42 +119,52 @@
                 {data: 'action', className: 'text-center align-middle', orderable: false, searchable: false},
             ],
             dom: 'Blfrtip',
-            "buttons": [{
-                extend: 'collection',
-                text: 'Export',
-                buttons: ['export', { extend: 'excel',
-                    text: 'Export All Excel',              //Export all to CSV file
-                    action: function (e, dt, node, config) {
-                        window.location.href = '{{ route('products.index') }}?ExportToExcel=Yes';
+
+            buttons: [
+                {
+                    extend: 'copy',
+                    text: 'Copy',
+                    exportOptions: {
+                        columns: [0, 1, 2, 3, 4, 5]
                     }
                 },
-                    { extend: 'pdf',
-                        text: 'PDF Current Page',
-                        exportOptions: {
-                            columns: [0,1,2,3,4,5],
-                            modifier: {
-                                page: 'current'
-                            }
-                        },
-                    },
-                    { extend: 'excel',
-                        text: 'Excel Current Page',              //Export all to CSV file
-                        exportOptions: {
-                            columns: [0,1,2,3,4,5],
-                            modifier: {
-                                page: 'all'
-                            }
-                        },
-                    }]
-            }
+                {
+                    extend: 'csv',
+                    text: 'CSV',
+                    exportOptions: {
+                        columns: [0, 1, 2, 3, 4, 5]
+                    }
+                },
+                {
+                    extend: 'excel',
+                    text: 'Excel',
+                    exportOptions: {
+                        columns: [0, 1, 2, 3, 4, 5]
+                    }
+                },
+                {
+                    extend: 'pdfHtml5',
+                    text: 'PDF',
+                    orientation: 'landscape',
+                    pageSize: 'LEGAL',
+                    exportOptions: {
+                        columns: [0, 1, 2, 3, 4, 5]
+                    }
+                },
+                {
+                    extend: 'print',
+                    text: 'Print',
+                    exportOptions: {
+                        columns: [0, 1, 2, 3, 4, 5]
+                    }
+                },
             ],
-
         });
 
-        $('#unique-search').on('click', function(e) {
+        /*$('#unique-search').onclick(function(e) {
             table.draw();
             e.preventDefault();
-        });
+        });*/
 
     </script>
 

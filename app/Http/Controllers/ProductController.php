@@ -3,14 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Exports\ProductExport;
-use App\Models\Pfi;
 use App\Product;
 use App\Price;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use DB;
 use Auth;
-
+use Barryvdh\DomPDF\Facade\Pdf;
 use Maatwebsite\Excel\Facades\Excel;
 use Yajra\DataTables\Facades\DataTables;
 
@@ -23,13 +22,14 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        $ExportToExcel = $request->ExportToExcel;
+        $exportToExcel = $request->ExportToExcel;
+        $exportToPdf = $request->ExportToPdf;
 
-       if ($ExportToExcel == 'Yes'){
+       if ($exportToExcel == 'Yes'){
            return Excel::download(new ProductExport(), 'products.xlsx');
          }
 
-        if ($request->ajax()) {
+      /*  if ($request->ajax()) {*/
             $user = Auth()->user();
             $medicine_id = $request->medicine_name;
             $generic_id = $request->generic_name;
@@ -47,7 +47,7 @@ class ProductController extends Controller
                 //$data = Product::orderBy('medicine_name','asc')->get();
                 $data = Product::all();
             }
-
+          if ($request->ajax()) {
             return Datatables::of($data)
                 ->addIndexColumn()
                 ->addColumn('action', function($row) use($user){
@@ -68,6 +68,7 @@ class ProductController extends Controller
                 })
                 ->rawColumns(['action'])
                 ->make(true);
+
         }
 
         return view('products.index');

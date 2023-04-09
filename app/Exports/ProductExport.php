@@ -12,8 +12,8 @@ class ProductExport implements FromCollection
     */
     public function collection()
     {
-        $products = Product::all(); // get all users from the database
-        // map each user to an array of columns
+        $products = Product::all();
+
         $data = $products->map(function($product) {
             return [
                 $product->id,
