@@ -22,32 +22,24 @@ class ProductController extends Controller
      */
     public function index(Request $request)
     {
-        $exportToExcel = $request->ExportToExcel;
-        $exportToPdf = $request->ExportToPdf;
+        $user = Auth()->user();
+        $medicine_id = $request->medicine_name;
+        $generic_id = $request->generic_name;
 
-       if ($exportToExcel == 'Yes'){
-           return Excel::download(new ProductExport(), 'products.xlsx');
-         }
-
-      /*  if ($request->ajax()) {*/
-            $user = Auth()->user();
-            $medicine_id = $request->medicine_name;
-            $generic_id = $request->generic_name;
-
-            if ($medicine_id || $generic_id){
-                $medicine_nm = ''; $medicine_gnrc_nm = ''; $medicine_strngth = '';
-                $product_name_strengths= Product::where('id',$medicine_id)->orWhere('id',$generic_id)->get();
-                foreach ($product_name_strengths as $product_name_strength){
-                    $medicine_nm = $product_name_strength->medicine_name;
-                    $medicine_gnrc_nm = $product_name_strength->generic_name;
-                    $medicine_strngth = $product_name_strength->strength;
-                }
-                $data = Product::where('medicine_name',$medicine_nm)->Where('generic_name',$medicine_gnrc_nm)->Where('strength',$medicine_strngth)->get();
-            }else{
-                //$data = Product::orderBy('medicine_name','asc')->get();
-                $data = Product::all();
+        if ($medicine_id || $generic_id){
+            $medicine_nm = ''; $medicine_gnrc_nm = ''; $medicine_strngth = '';
+            $product_name_strengths= Product::where('id',$medicine_id)->orWhere('id',$generic_id)->get();
+            foreach ($product_name_strengths as $product_name_strength){
+                $medicine_nm = $product_name_strength->medicine_name;
+                $medicine_gnrc_nm = $product_name_strength->generic_name;
+                $medicine_strngth = $product_name_strength->strength;
             }
-          if ($request->ajax()) {
+            $data = Product::where('medicine_name',$medicine_nm)->Where('generic_name',$medicine_gnrc_nm)->Where('strength',$medicine_strngth)->get();
+        }else{
+            //$data = Product::orderBy('medicine_name','asc')->get();
+            $data = Product::all();
+        }
+        if ($request->ajax()) {
             return Datatables::of($data)
                 ->addIndexColumn()
                 ->addColumn('action', function($row) use($user){
@@ -77,28 +69,28 @@ class ProductController extends Controller
     public function getAutoSuggestProduct(Request $request)
     {
 
-      $output = '';
-      $product_name = $request->input('product_name');
-      $productsFound = Product::where('medicine_name', 'like', $product_name."%")->paginate(900);
+        $output = '';
+        $product_name = $request->input('product_name');
+        $productsFound = Product::where('medicine_name', 'like', $product_name."%")->paginate(900);
 
-      foreach ($productsFound as $productsFound){
-        $output .='<option value="'.$productsFound->id.'">'.$productsFound->medicine_name.'  '.$productsFound->strength.'</option>';
-      }
-      echo $output;
+        foreach ($productsFound as $productsFound){
+            $output .='<option value="'.$productsFound->id.'">'.$productsFound->medicine_name.'  '.$productsFound->strength.'</option>';
+        }
+        echo $output;
 
     }
 
     public function getAutoSuggestGeneric(Request $request)
     {
 
-      $outputgn = '';
-      $generic_name = $request->input('generic_name');
-      $productsFoundByGeneric = Product::where('generic_name', 'like', $generic_name."%")->paginate(900);
+        $outputgn = '';
+        $generic_name = $request->input('generic_name');
+        $productsFoundByGeneric = Product::where('generic_name', 'like', $generic_name."%")->paginate(900);
 
-      foreach ($productsFoundByGeneric as $productsFoundByGeneric){
-        $outputgn .='<option value="'.$productsFoundByGeneric->id.'">'.$productsFoundByGeneric->generic_name.'  '.$productsFoundByGeneric->strength.'</option>';
-      }
-      echo $outputgn;
+        foreach ($productsFoundByGeneric as $productsFoundByGeneric){
+            $outputgn .='<option value="'.$productsFoundByGeneric->id.'">'.$productsFoundByGeneric->generic_name.'  '.$productsFoundByGeneric->strength.'</option>';
+        }
+        echo $outputgn;
 
     }
 
@@ -202,12 +194,12 @@ class ProductController extends Controller
             'created_by' => $created_by,
             'created_at' =>date('Y-m-d H:i:s'),
             'updated_at' =>date('Y-m-d H:i:s')
-          ];
+        ];
 
         $prices = Price::insert($price_data);
 
         return redirect()->route('products.index')
-                        ->with('success','Product created successfully');
+            ->with('success','Product created successfully');
     }
 
     /**
@@ -281,9 +273,9 @@ class ProductController extends Controller
         if(($purchase_price != $purchase_price_old) || ($sales_price != $sales_price_old) || ($discount_rate != $discount_rate_old) || ($vat_rate != $vat_rate_old) ){
             $updt_affected = DB::table('prices')->where('product_id',$product_id)->where('end_date',null)->where('status','Active')->update(['end_date' => date('Y-m-d H:i:s'), 'status' => 'Inactive', 'updated_by' => $updated_by,'updated_at' => date('Y-m-d H:i:s')]);
 
-         }
+        }
 
-         if(($purchase_price != $purchase_price_old) || ($sales_price != $sales_price_old) || ($discount_rate != $discount_rate_old) || ($vat_rate != $vat_rate_old) ){
+        if(($purchase_price != $purchase_price_old) || ($sales_price != $sales_price_old) || ($discount_rate != $discount_rate_old) || ($vat_rate != $vat_rate_old) ){
 
             $price_data[]=[
                 'product_id' =>$product_id,
@@ -298,14 +290,14 @@ class ProductController extends Controller
                 'created_by' => Auth::user()->name,
                 'created_at' =>date('Y-m-d H:i:s'),
                 'updated_at' =>date('Y-m-d H:i:s')
-              ];
+            ];
 
             $prices = Price::insert($price_data);
-         }
+        }
 
         //$product->update($request->all());
         return redirect()->route('products.index')
-                        ->with('success','Product updated successfully');
+            ->with('success','Product updated successfully');
     }
 
     /**
@@ -318,7 +310,7 @@ class ProductController extends Controller
     {
         $product->delete();
         return redirect()->route('products.index')
-                        ->with('success','Product deleted successfully');
+            ->with('success','Product deleted successfully');
     }
 
 }
